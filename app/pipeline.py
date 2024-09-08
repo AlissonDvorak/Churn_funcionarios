@@ -21,7 +21,7 @@ from fastapi.responses import StreamingResponse
 
 
 def importarDados():
-    dados = pd.read_csv("../churn/archive/HR_Dataset.csv")
+    dados = pd.read_csv("./Churn_funcionarios/archive/HR_Dataset.csv")
     dados.head()
     return dados
 
@@ -90,7 +90,7 @@ def aplicar_one_hot_encoder(dados):
     encoder = OneHotEncoder(drop='first', sparse_output=False)
     encoded_categorias = encoder.fit_transform(dados[categorias])
     
-    with open('./arquivos_pickle/encoder.pkl', 'wb') as file:
+    with open('./Churn_funcionarios/arquivos_pickle/encoder.pkl', 'wb') as file:
         pickle.dump(encoder, file)
 
     # Ajustar os nomes das colunas para remover espaços extras
@@ -119,7 +119,7 @@ def compararModelos(dados_encoded):
     print("Detalhes do Melhor Modelo:")
     print(s.pull())
 
-    with open('./arquivos_pickle/melhor_modelo.pkl', 'wb') as file:
+    with open('./Churn_funcionarios/arquivos_pickle/melhor_modelo.pkl', 'wb') as file:
         pickle.dump(final_model, file)
     print("Modelo salvo em 'melhor_modelo.pkl'")
 
@@ -144,14 +144,8 @@ def realizar_pipeline(vizualizar_distribuicao_classes, gerar_baseline,  melhorMo
         return dummy(dados)
 
 
-def carregar_modelo(caminho_arquivo='melhor_modelo.pkl'):
-    with open(caminho_arquivo, 'rb') as file:
-        modelo = pickle.load(file)
-    return modelo
-
-
 def churnRF(dados_brutos):
-    modeloRF = pickle.load(open('./arquivos_pickle/melhor_modelo.pkl', 'rb'))
+    modeloRF = pickle.load(open('./Churn_funcionarios/arquivos_pickle/melhor_modelo.pkl', 'rb'))
 
     colunas_esperadas = [
         'satisfaction_level', 'last_evaluation', 'number_project', 'average_montly_hours',
@@ -168,7 +162,7 @@ def churnRF(dados_brutos):
     df_categorias = df_dados_brutos[categorias]
     df_dados_numericos = df_dados_brutos.drop(columns=categorias)
 
-    encoder = pickle.load(open('./arquivos_pickle/encoder.pkl', 'rb'))
+    encoder = pickle.load(open('./Churn_funcionarios/arquivos_pickle/encoder.pkl', 'rb'))
     encoder.fit(df_categorias)
 
     df_encoded = pd.DataFrame(encoder.transform(df_categorias), columns=encoder.get_feature_names_out(categorias))
